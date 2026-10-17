@@ -90,13 +90,46 @@ const taskList = [
 ];
 
 function App() {
-  const [tasks, setTasks] = useState(taskList);
-
-  
 const [title, setTitle] = useState("");
 const [description, setDescription] = useState("");
 const [isCompleted, setIsCompleted] = useState(false);
 
+  const [tasks, setTasks] = useState(() => {
+    try {
+      const localdata = localStorage.getItem("tasks");
+      return localdata ? JSON.parse(localdata) : []
+    } catch (error) {
+      console.log(error);
+      return []
+    }
+    
+  });
+
+
+
+  const handleSubmit = (e) => {
+    e.preventDefult();
+    if (!title.trim()){
+      alert("Please enter a task title")
+      return;
+    }
+    const newTask ={
+      id:Date.now().toString(),
+      title: title.trim(),
+      description: description.trim(),
+      isCompleted:isCompleted,
+    };
+    setTasks((prevTask) =>[newTask, ...prevTask]);
+
+  }
+
+  useEffect(() =>{
+    try {
+       localStorage.setItem("tasks" , tasks)
+    } catch (error) {
+      console.log(error);
+    }
+  });
 
 
   return (
@@ -139,6 +172,18 @@ const [isCompleted, setIsCompleted] = useState(false);
 
       <button type="submit">Add Task</button>
     </form>
+
+    <div className="task-list">
+    {tasks.map((task) =>(
+      <div className="task-card" key={task.id}> 
+      <h3>{task.title}</h3>
+      <p>{task.description || "No description"}</p>
+      <p>
+        {task.isCompleted ? "Completed" : "UnCompleted"}
+      </p>
+      </div>
+    ))}
+    </div>
   </div>
 );
 }
