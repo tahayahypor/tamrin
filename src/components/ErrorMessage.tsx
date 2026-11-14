@@ -20,4 +20,4 @@ const ErrorMessage = ({ error, onRetry }: ErrorMessageProps) => {
   );
 };
 
-export default ErrorMessage;
+export default ErrorMessage;  

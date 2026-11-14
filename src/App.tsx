@@ -419,68 +419,162 @@
 
 
 
-import { useState } from "react";
+// import { useState } from "react";
 
-import { usePosts } from "./hook/usePosts";
+// import { usePosts } from "./hook/usePosts";
 
-import Loading from "./components/Loading";
-import ErrorMessage from "./components/ErrorMessage";
-import PostList from "./components/postList-temp";
-import PostSearch from "./components/PostSearch";
-import PostForm from "./components/PostForm";
+// import Loading from "./components/Loading";
+// import ErrorMessage from "./components/ErrorMessage";
+// import PostList from "./components/postList-temp";
+// import PostSearch from "./components/PostSearch";
+// import PostForm from "./components/PostForm";
 
-function App() {
- const {
-  posts,
-  loading,
-  error,
-  retry,
-  addPost,
-  creating,
-  createError,
-} = usePosts();
-  const [search, setSearch] = useState("");
+// function App() {
+//  const {
+//   posts,
+//   loading,
+//   error,
+//   retry,
+//   addPost,
+//   creating,
+//   createError,
+// } = usePosts();
+//   const [search, setSearch] = useState("");
 
-  if (loading) {
-    return <Loading />;
-  }
+//   if (loading) {
+//     return <Loading />;
+//   }
 
-  if (error) {
-    return <ErrorMessage error={error} onRetry={retry} />;
-  }
+//   if (error) {
+//     return <ErrorMessage error={error} onRetry={retry} />;
+//   }
 
-  const filteredPosts = posts.filter((post) =>
-    post.title.toLowerCase().includes(search.toLowerCase())
+//   const filteredPosts = posts.filter((post) =>
+//     post.title.toLowerCase().includes(search.toLowerCase())
+//   );
+
+//   return (
+//     <main className="min-h-screen bg-gray-100 p-6">
+//       <div className="max-w-6xl mx-auto">
+
+//         <h1 className="text-3xl font-bold text-gray-800 mb-8">
+//           Posts Manager
+//         </h1>
+
+//         <PostSearch
+//           value={search}
+//           onChange={setSearch}
+//         />
+
+//         <PostForm
+//           onCreate={addPost}
+//           creating={creating}
+//           error={createError}
+//           />
+
+//         <p className="text-gray-500 mb-6">
+//           Showing {filteredPosts.length} of {posts.length} posts
+//         </p>
+
+//         <PostList posts={filteredPosts} />
+
+//       </div>
+//     </main>
+//   );
+// }
+
+// export default App;
+
+
+
+import { useReducer } from "react";
+import { cartReducer } from "./reducers/cart.reducer";
+import type { Product } from "./types/cart.types";
+import type { CartAction } from "./reducers/cart.reducer";
+import type { ActionDispatch } from "react";
+import Cart from "./components/Cart";
+import ProductCard from "./components/ProductCard";
+
+const PRODUCTS: Product[] = [
+  {
+    id: "item1",
+    title: "Asus Laptop",
+    description: "Lorem ipsum dolor sit amet consectetur adipisicing elit.",
+    quantity: 3,
+    price: 1000,
+  },
+  {
+    id: "item2",
+    title: "MacBookAir",
+    description: "Lorem ipsum dolor sit amet consectetur adipisicing elit.",
+    quantity: 2,
+    price: 6000,
+  },
+  {
+    id: "item3",
+    title: "Dell Laptop",
+    description: "Lorem ipsum dolor sit amet consectetur adipisicing elit.",
+    quantity: 5,
+    price: 2000,
+  },
+  {
+    id: "item4",
+    title: "HP Laptop",
+    description: "Lorem ipsum dolor sit amet consectetur adipisicing elit.",
+    quantity: 7,
+    price: 1300,
+  },
+];
+
+const App = () => {
+  const [cart, dispatch] = useReducer(cartReducer, []);
+
+  const totalQuantity = cart.reduce(
+    (total, item) => total + item.cartQuantity,
+    0
   );
 
-  return (
-    <main className="min-h-screen bg-gray-100 p-6">
-      <div className="max-w-6xl mx-auto">
+  const totalPrice = cart.reduce(
+    (total, item) => total + item.price * item.cartQuantity,
+    0
+  );
 
-        <h1 className="text-3xl font-bold text-gray-800 mb-8">
-          Posts Manager
-        </h1>
 
-        <PostSearch
-          value={search}
-          onChange={setSearch}
-        />
+ return (
+  <div className="min-h-screen bg-gray-100 p-4 md:p-8">
 
-        <PostForm
-          onCreate={addPost}
-          creating={creating}
-          error={createError}
-          />
+    <h1 className="text-3xl font-bold mb-8">
+      Laptop Store
+    </h1>
 
-        <p className="text-gray-500 mb-6">
-          Showing {filteredPosts.length} of {posts.length} posts
-        </p>
+    <div className="grid grid-cols-1 lg:grid-cols-[1fr_350px] gap-6">
 
-        <PostList posts={filteredPosts} />
+      <div>
+        <h2 className="text-2xl font-bold mb-4">
+          Products
+        </h2>
 
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+          {PRODUCTS.map((product) => (
+            <ProductCard
+              product={product}
+              dispatch={dispatch}
+              key={product.id}
+            />
+          ))}
+        </div>
       </div>
-    </main>
-  );
-}
+
+      <Cart
+        cart={cart}
+        dispatch={dispatch}
+        totalQuantity={totalQuantity}
+        totalPrice={totalPrice}
+      />
+
+    </div>
+  </div>
+);
+};
 
 export default App;
